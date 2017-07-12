@@ -15,17 +15,21 @@ class MeteorologistController < ApplicationController
     # The street address that the user typed is in the variable @street_address.
     # ==========================================================================
 
+    coordinates = JSON.parse(open("https://maps.googleapis.com/maps/api/geocode/json?address=" + URI::encode(@street_address)).read)
+    @lat = coordinates["results"][0]["geometry"]["location"]["lat"]
+    @lng = coordinates["results"][0]["geometry"]["location"]["lng"]
 
+    weather = JSON.parse(open("https://api.darksky.net/forecast/a4f569fa6c8872b6f37f4c6178f8d120/" + @lat.to_s + "," + @lng.to_s).read)
 
-    @current_temperature = "Replace this string with your answer."
+    @current_temperature = weather["currently"]["temperature"]
 
-    @current_summary = "Replace this string with your answer."
+    @current_summary = weather["currently"]["summary"]
 
-    @summary_of_next_sixty_minutes = "Replace this string with your answer."
+    @summary_of_next_sixty_minutes = weather["minutely"]["summary"]
 
-    @summary_of_next_several_hours = "Replace this string with your answer."
+    @summary_of_next_several_hours = weather["hourly"]["summary"]
 
-    @summary_of_next_several_days = "Replace this string with your answer."
+    @summary_of_next_several_days = weather["daily"]["summary"]
 
     render("meteorologist/street_to_weather.html.erb")
   end
